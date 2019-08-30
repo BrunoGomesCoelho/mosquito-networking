@@ -24,8 +24,9 @@ def read_all_csvs(folder_path):
     files = [str(x) for x in path.iterdir() if "csv" in x.name]
 
     # set up your pool
-    pool = Pool()
+    pool = Pool(processes=20)
     df_list = pool.map(my_read_csv, files)
+    pool.close()
 
     # reduce the list of dataframes to a single dataframe
     return pd.concat(df_list, ignore_index=True)
@@ -35,7 +36,7 @@ def my_read_wav(filename):
     return np.hstack((wavfile.read(filename), np.array([filename])))
 
 
-def read_all_wavs(folder_path, sampling_rate=44100,
+def read_all_wavs(folder_path, pool_size=None, sampling_rate=44100,
                   testing=False, test_size=1000):
     """Reads and joins all our wavs files into one big dataframe.
     We do it in parallel to make it faster, since otherwise it takes some time.
@@ -55,7 +56,7 @@ def read_all_wavs(folder_path, sampling_rate=44100,
         files = files[:test_size]
 
     # set up your pool
-    pool = Pool()
+    pool = Pool(pool_size)
     all_wavs = np.array(pool.map(my_read_wav, files))
 
     # Check all files have the same sampling rate
