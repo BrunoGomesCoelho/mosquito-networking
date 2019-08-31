@@ -9,6 +9,7 @@ import pandas as pd
 from librosa.util import pad_center
 
 from src.data.read_dataset import read_all_wavs, read_all_csvs
+from src.data import util
 
 
 """
@@ -19,7 +20,7 @@ def main(input_filepath, output_filepath):
 """
 
 
-def main(subsample=0):
+def main(reduce_mem_usage=True, subsample=0, save=False):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -43,9 +44,19 @@ def main(subsample=0):
 
     output_df = process_wav_length(data[:, 1], wav_df, df)
     logger.info('finished processing into 1 df')
+
+    if reduce_mem_usage:
+        logger.info('Trying to reduce memory usage')
+        output_df = util.reduce_mem_usage(output_df)
+
+    if save:
+        save_file = "../../data/processed/data.csv"
+        logger.warning('Saving can take a really long time!')
+        logger.info(f'Saving to {save_file}')
+        output_df.to_csv(save_file, index=False)
+        logger.info('finished saving')
+
     return output_df
-    #output_df.to_csv("../../data/processed/data.csv", index=False)
-    #logger.info('finished saving')
 
 
 def process_wav_length(wav_data, filenames, df, seconds=0.5, sr=44100):
