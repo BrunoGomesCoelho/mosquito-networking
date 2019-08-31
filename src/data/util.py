@@ -6,12 +6,20 @@ import numpy as np
 
 
 def transform_torch(data_vector, device, from_numpy=True):
+    # Reshape vectors
+    new_vector = []
+    for x in data_vector[:2]:
+        new_vector.append(x.values.reshape(len(x), 1, -1))
+    for x in data_vector[2:]:
+        new_vector.append(x.values.reshape(-1, 1))
+
+
     if from_numpy:
         logger = logging.getLogger(__name__)
         logger.warning("From numpy option does not send to device!")
-        return [torch.from_numpy(x.values) for x in data_vector]
+        return [torch.from_numpy(x).float() for x in new_vector]
     else:
-        return [torch.tensor(x.values, device=device) for x in data_vector]
+        return [torch.tensor(x, device=device).float() for x in new_vector]
 
 
 def get_train_test(df, x_cols=None, division="training", target="label",
