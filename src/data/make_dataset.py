@@ -19,13 +19,18 @@ def main(input_filepath, output_filepath):
 """
 
 
-def main():
+def main(subsample=0):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
-    data = read_all_wavs("../data/raw/dadosBruno/")
+    if subsample:
+        data = read_all_wavs("../data/raw/dadosBruno/", testing=True,
+                             test_size=subsample)
+    else:
+        data = read_all_wavs("../data/raw/dadosBruno/")
+
     df = read_all_csvs("../data/raw/")
     logger.info('load intitial data')
 
