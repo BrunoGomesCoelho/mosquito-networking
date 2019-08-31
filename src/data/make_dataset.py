@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from librosa.util import pad_center
 
-from read_dataset import read_all_wavs, read_all_csvs
+from src.data.read_dataset import read_all_wavs, read_all_csvs
 
 
 """
