@@ -14,11 +14,12 @@ def transform_torch(data_vector, device, from_numpy=True):
         return [torch.tensor(x.values, device=device) for x in data_vector]
 
 
-def get_train_test(df, x_cols=None, target="label", subtract_mean=True):
+def get_train_test(df, x_cols=None, division="training", target="label",
+                   subtract_mean=True):
     if x_cols is None:
         x_cols = [x for x in range(22049 + 1)]
-    train = df.query("label == 1.0")
-    test = df.query("label != 1.0")
+    train = df.query(f"{division} == 1.0")
+    test = df.query(f"{division} != 1.0")
 
     x_train = train[x_cols]
     y_train = train[target]
