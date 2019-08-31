@@ -52,8 +52,10 @@ def read_all_wavs(folder_path, pool_size=None, sampling_rate=44100,
     files = [str(x) for x in path.rglob("*") if "wav" in x.name]
 
     if testing:
-        print(f"We have {len(files)} wavs")
-        files = files[:test_size]
+        # Get a random sample of the data
+        idx = np.random.randint(len(files), size=test_size)
+        files = np.array(files)
+        files = list(files[idx])
 
     # set up your pool
     pool = Pool(pool_size)
