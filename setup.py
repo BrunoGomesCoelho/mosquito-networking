@@ -4,7 +4,7 @@ setup(
     name='src',
     packages=find_packages(),
     version='0.1.0',
-    description='Analizing extremelly simple NN and other models for mosquito classification',
+    description='Analizing simple NN and other models for mosquito classification',
     author='Bruno Coelho',
     license='',
 )
