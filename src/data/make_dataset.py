@@ -63,6 +63,10 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
         output_df.to_csv(save_file, index=False)
         logger.info('finished saving')
 
+    logger.info('Mapping any non 1.0 label into 0')
+    idx = output_df["label"] != 1.0
+    output_df.loc[idx, "label"] = 0.0
+
     return output_df
 
 
