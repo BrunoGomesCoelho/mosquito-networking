@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
+import logging
+
+import torch
 import numpy as np
+
+
+def transform_torch(data_vector, device, from_numpy=True):
+    if from_numpy:
+        logger = logging.getLogger(__name__)
+        logger.warning("From numpy option does not send to device!")
+        return [torch.from_numpy(x.values) for x in data_vector]
+    else:
+        return [torch.tensor(x.values, device=device) for x in data_vector]
 
 
 def get_train_test(df, x_cols=None, target="label", subtract_mean=True):
