@@ -25,14 +25,14 @@ def main():
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
-    data = read_all_wavs("../../data/raw/dadosBruno/")
-    df = read_all_csvs("../../data/raw/")
+    data = read_all_wavs("../data/raw/dadosBruno/")
+    df = read_all_csvs("../data/raw/")
     logger.info('load intitial data')
 
     # Join sizes with original data
     wav_df = pd.DataFrame(data[:, 2].copy(), columns=["name"])
 
-    offset = len("../../data/raw/dadosBruno/t04/t04_")
+    offset = len("../data/raw/dadosBruno/t04/t04_")
     wav_df["file"] = wav_df["name"].str.slice(offset).apply(lambda x: x[::-1])
     wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
 

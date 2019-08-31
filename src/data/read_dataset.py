@@ -60,6 +60,7 @@ def read_all_wavs(folder_path, pool_size=None, sampling_rate=44100,
     all_wavs = np.array(pool.map(my_read_wav, files))
 
     # Check all files have the same sampling rate
+    return all_wavs
     different_sr = (all_wavs[:, 0] != sampling_rate).sum()
     if different_sr:
         raise ValueError(f"We have {different_sr}" +
