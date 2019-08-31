@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import gc
 import click
 import logging
 from pathlib import Path
@@ -26,6 +27,8 @@ def main(reduce_mem_usage=True, subsample=0, save=False):
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
+
+    # Check for using less data
     if subsample:
         data = read_all_wavs("../data/raw/dadosBruno/", testing=True,
                              test_size=subsample)
@@ -48,6 +51,9 @@ def main(reduce_mem_usage=True, subsample=0, save=False):
     if reduce_mem_usage:
         logger.info('Trying to reduce memory usage')
         output_df = util.reduce_mem_usage(output_df)
+
+    # Call the garbage collector manually
+    gc.collect()
 
     if save:
         save_file = "../../data/processed/data.csv"
