@@ -21,7 +21,7 @@ def main(input_filepath, output_filepath):
 """
 
 
-def main(reduce_mem_usage=True, subsample=0, save=False):
+def main(reduce_mem_usage=False, subsample=0, save=False):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -49,6 +49,7 @@ def main(reduce_mem_usage=True, subsample=0, save=False):
     logger.info('finished processing into 1 df')
 
     if reduce_mem_usage:
+        logger.warning('This seems to take longer that it is worth it!')
         logger.info('Trying to reduce memory usage')
         output_df = util.reduce_mem_usage(output_df)
 
