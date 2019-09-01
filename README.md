@@ -55,3 +55,13 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+## Installation
+
+Use `make create-environment` - we suggest a name of "mosquito-networking" for the env.
+Use `make requirements` :)
+
+Make sure to run `python3 -m ipykernel install --user --name=mosquito-networking` if running notebooks as wells (see [here](https://janakiev.com/blog/jupyter-virtual-envs/) for more help).
+
+
