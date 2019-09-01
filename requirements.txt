@@ -18,4 +18,5 @@ torchsummary
 ipykernel
 autopep8
 tensorboard
+future
 
