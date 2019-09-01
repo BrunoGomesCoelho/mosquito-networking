@@ -2,10 +2,28 @@
 from pathlib import Path
 from multiprocessing import Pool  # for reading the CSVs faster
 
+import torch
 import numpy as np
 import pandas as pd
 from scipy.io import wavfile
 
+
+class MosquitoDataset(torch.utils.data.Dataset):
+    """Mosquito dataset for PyTorch"""
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.x)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        x = self.x[index]
+        y = self.y[index]
+
+        return x, y
 
 
 def my_read_csv(filename):
