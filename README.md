@@ -64,4 +64,6 @@ Use `make requirements` :)
 
 Make sure to run `python3 -m ipykernel install --user --name=mosquito-networking` if running notebooks as wells (see [here](https://janakiev.com/blog/jupyter-virtual-envs/) for more help).
 
+# Problems
 
+Problems with locale in tensorboard can be fixed with 
