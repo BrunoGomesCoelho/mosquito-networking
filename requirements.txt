@@ -19,4 +19,6 @@ ipykernel
 autopep8
 tensorboard
 future
+jupyter-tensorboard
+tensorflow
 
