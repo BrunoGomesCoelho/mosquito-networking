@@ -3,6 +3,7 @@ from pathlib import Path
 from multiprocessing import Pool  # for reading the CSVs faster
 
 import torch
+import torch.utils.data
 import numpy as np
 import pandas as pd
 from scipy.io import wavfile
