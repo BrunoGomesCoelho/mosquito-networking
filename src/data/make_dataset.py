@@ -42,6 +42,7 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     wav_df = pd.DataFrame(data[:, 2].copy(), columns=["name"])
 
     offset = len("../data/raw/dadosBruno/t04/t04_")
+    wav_df["original_name"] = wav_df["name"].copy(deep=True)
     wav_df["file"] = wav_df["name"].str.slice(offset).apply(lambda x: x[::-1])
     wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
 
@@ -67,6 +68,10 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     idx = output_df["label"] != 1.0
     output_df.loc[idx, "label"] = 0.0
 
+    logger.info("Saving intermediate google colab CSV")
+    df[["label", "original_name"]].to_csv("../../data/interim/file_names.csv",
+            index=False)
+
     return output_df
 
 
@@ -85,6 +90,7 @@ def process_wav_length(wav_data, filenames, df, seconds=0.5, sr=44100):
 
     new_df = pd.DataFrame(padded_wavs)
     new_df["file"] = filenames.loc[idx, "file"].values
+    new_df["original_name"] = filenames.loc[idx, "original_name"].values
 
     full_df = pd.merge(df, new_df, left_on="file", right_on="file",
                        validate="1:1", how="right")
