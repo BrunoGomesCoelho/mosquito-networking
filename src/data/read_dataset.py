@@ -43,7 +43,7 @@ def read_all_csvs(folder_path):
     files = [str(x) for x in path.iterdir() if "csv" in x.name]
 
     # set up your pool
-    pool = Pool(processes=20)
+    pool = Pool(processes=1)
     df_list = pool.map(my_read_csv, files)
     pool.close()
 

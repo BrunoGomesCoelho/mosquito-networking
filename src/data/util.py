@@ -5,14 +5,19 @@ import torch
 import numpy as np
 
 
-def transform_torch(data_vector, device, from_numpy=True):
+def transform_torch(data_vector, device, from_numpy=True, is_pandas=True):
     # Reshape vectors
     new_vector = []
-    for x in data_vector[:2]:
-        new_vector.append(x.values.reshape(len(x), 1, -1))
-    for x in data_vector[2:]:
-        new_vector.append(x.values.reshape(-1, 1))
-
+    if is_pandas:
+        for x in data_vector[:2]:
+            new_vector.append(x.values.reshape(len(x), 1, -1))
+        for x in data_vector[2:]:
+            new_vector.append(x.values.reshape(-1, 1))
+    else:
+        for x in data_vector[:2]:
+            new_vector.append(x.reshape(len(x), 1, -1))
+        for x in data_vector[2:]:
+            new_vector.append(x.reshape(-1, 1))
 
     if from_numpy:
         logger = logging.getLogger(__name__)
@@ -20,6 +25,17 @@ def transform_torch(data_vector, device, from_numpy=True):
         return [torch.from_numpy(x).float() for x in new_vector]
     else:
         return [torch.tensor(x, device=device).float() for x in new_vector]
+
+
+def convert_cuda(local_batch, local_labels, device):
+    # Convert shapes and send to Cuda
+    local_batch = torch.tensor(local_batch.float(), device=device)
+    local_labels = local_labels.reshape(-1, 1)
+    local_labels = torch.tensor(local_labels.float(), device=device)
+
+    return local_batch, local_labels
+
+
 
 
 def get_train_test(df, x_cols=None, division="training", target="label",

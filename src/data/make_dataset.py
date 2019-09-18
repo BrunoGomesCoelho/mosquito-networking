@@ -47,6 +47,7 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
 
     output_df = process_wav_length(data[:, 1], wav_df, df)
+    output_df["label"] = output_df["label"].astype(int)
     logger.info('finished processing into 1 df')
 
     if reduce_mem_usage:
@@ -69,7 +70,7 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     output_df.loc[idx, "label"] = 0.0
 
     logger.info("Saving intermediate google colab CSV")
-    df[["label", "original_name"]].to_csv("../../data/interim/file_names.csv",
+    output_df[["label", "training", "original_name"]].to_csv("../data/interim/file_names.csv",
             index=False)
 
     return output_df
