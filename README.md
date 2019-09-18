@@ -64,6 +64,15 @@ Use `make requirements` :)
 
 Make sure to run `python3 -m ipykernel install --user --name=mosquito-networking` if running notebooks as wells (see [here](https://janakiev.com/blog/jupyter-virtual-envs/) for more help).
 
-# Problems
+# Google Colab
 
-Problems with locale in tensorboard can be fixed with 
+I am using google colab to run basic tests on a GPU. This means that to run, you will need to upload:
+
+- The src/ folder, more spefically the .py in data/
+- The file in data/interim
+- ALL the audio files in data/
+
+All of this respecting the folder of this project.
+
+Check out notebook "0.7-BrunoGomesCoelho-Colab experiment.ipynb" for a basic script.
+
