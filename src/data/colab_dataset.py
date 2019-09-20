@@ -7,11 +7,12 @@ from librosa.util import pad_center
 
 class MosquitoDatasetColab(torch.utils.data.Dataset):
     """Mosquito dataset for PyTorch"""
-    def __init__(self, x, y, device, samples=22050):
+    def __init__(self, x, y, device, scaler, samples=22050):
         self.x = x
         self.y = y
         self.device = device
         self.samples = samples
+        self.scaler = scaler
 
     def __len__(self):
         'Denotes the total number of samples'
@@ -21,6 +22,7 @@ class MosquitoDatasetColab(torch.utils.data.Dataset):
         'Generates one sample of data'
         x = wavfile.read(self.x[index])[1]
         x = pad_center(x, self.samples)
+        x = self.scaler.transform(x.reshape(1, -1))
         y = self.y[index]
 
         return x.reshape(1, -1), y
