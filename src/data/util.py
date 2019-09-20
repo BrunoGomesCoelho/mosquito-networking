@@ -29,9 +29,15 @@ def transform_torch(data_vector, device, from_numpy=True, is_pandas=True):
 
 def convert_cuda(local_batch, local_labels, device):
     # Convert shapes and send to Cuda
-    local_batch = torch.tensor(local_batch.float(), device=device)
+    #local_labels = torch.tensor(local_labels.float(), device=device)
+
+
+    #local_batch = local_batch.float().cuda()
+    #local_labels = local_labels.float().cuda()
+
+    local_batch = local_batch.float().to(device)
+    local_labels = local_labels.float().to(device)
     local_labels = local_labels.reshape(-1, 1)
-    local_labels = torch.tensor(local_labels.float(), device=device)
 
     return local_batch, local_labels
 
