@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.utils.data
-from scipy.io import wavfile
 from librosa.util import pad_center
 
 
@@ -20,7 +19,7 @@ class MosquitoDatasetColab(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         'Generates one sample of data'
-        x = wavfile.read(self.x[index])[1]
+        x = self.x[index]
         x = pad_center(x, self.samples)
         x = self.scaler.transform(x.reshape(1, -1))
         y = self.y[index]
