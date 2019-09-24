@@ -11,3 +11,16 @@ I'm going to try scale the data differently - since we have many zeros, I'm goin
 Going to try bigger batch\_size; Might try overfitting very small amount of data.
 
 Might have to include Batch Norm - in fact, I should really analyze the size of the network better.
+
+## 2/
+
+I kept the same scaling as the beginning - while the mean is skewed, maybe it will be ok...
+A better ideia might be MinMax scaling?
+
+changed batch\_size to 64
+
+Included batch norm
+
+included He initialization
+
+added accuracy to logs
