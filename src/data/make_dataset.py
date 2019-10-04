@@ -38,14 +38,11 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     df = read_all_csvs("../data/raw/")
     logger.info('load intitial data')
 
-    # Join sizes with original data
+    # Process the name column
     wav_df = pd.DataFrame(data[:, 2].copy(), columns=["name"])
+    process_name(wav_df)
 
-    offset = len("../data/raw/dadosBruno/t04/t04_")
-    wav_df["original_name"] = wav_df["name"].copy(deep=True)
-    wav_df["file"] = wav_df["name"].str.slice(offset).apply(lambda x: x[::-1])
-    wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
-
+    # Join sizes with original data
     output_df = process_wav_length(data[:, 1], wav_df, df)
     output_df["label"] = output_df["label"].astype(int)
     logger.info('finished processing into 1 df')
@@ -65,15 +62,38 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
         output_df.to_csv(save_file, index=False)
         logger.info('finished saving')
 
-    logger.info('Mapping any non 1.0 label into 0')
-    idx = output_df["label"] != 1.0
-    output_df.loc[idx, "label"] = 0.0
+    binarize_labels(output_df, logger)
 
     logger.info("Saving intermediate google colab CSV")
     output_df[["label", "training", "original_name"]].to_csv("../data/interim/file_names.csv",
             index=False)
 
     return output_df
+
+
+def binarize_labels(output_df, logger=None, keep_value=1.0):
+    """Maps any non 1.0 label to 0.0 so we can consider it a binary problem
+        with 2 classes, 0 and 1
+
+    Modifies our output_df in-place
+    """
+    if logger is not None:
+        logger.info('Mapping any non 1.0 label into 0')
+    idx = output_df["label"] != keep_value
+    output_df.loc[idx, "label"] = 0.0
+
+
+
+def process_name(wav_df):
+    """Process a given dataset, changing the name of the line to match
+        the name of the file so we can join them later.
+
+    Modifies our wav_df in-place
+    """
+    offset = len("../data/raw/dadosBruno/t04/t04_")
+    wav_df["original_name"] = wav_df["name"].copy(deep=True)
+    wav_df["file"] = wav_df["name"].str.slice(offset).apply(lambda x: x[::-1])
+    wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
 
 
 def process_wav_length(wav_data, filenames, df, seconds=0.5, sr=44100):

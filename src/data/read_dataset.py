@@ -9,6 +9,8 @@ import pandas as pd
 from scipy.io import wavfile
 
 
+
+
 class MosquitoDataset(torch.utils.data.Dataset):
     """Mosquito dataset for PyTorch"""
     def __init__(self, x, y):
@@ -25,6 +27,28 @@ class MosquitoDataset(torch.utils.data.Dataset):
         y = self.y[index]
 
         return x, y
+
+
+def read_temperature(temperature):
+    from src.data.make_dataset import (process_name, binarize_labels,
+                                       process_wav_length)
+    """Reads all data of a given temperature.
+
+        Valid options are temperature = t02, ..., t06"""
+    folder_path = f"../data/raw/dadosBruno/{temperature}/" 
+    data = read_all_wavs(folder_path)
+    df = pd.read_csv(f"../data/raw/{temperature}.csv")
+    
+    # Process the name column
+    wav_df = pd.DataFrame(data[:, 2].copy(), columns=["name"])
+    process_name(wav_df)
+
+    # Join sizes with original data
+    output_df = process_wav_length(data[:, 1], wav_df, df)
+    output_df["label"] = output_df["label"].astype(int)
+    binarize_labels(output_df) # binarize the labels
+    
+    return output_df
 
 
 def my_read_csv(filename):
@@ -61,8 +85,13 @@ def read_all_wavs(folder_path, pool_size=None, sampling_rate=44100,
     We do it in parallel to make it faster, since otherwise it takes some time.
     Idea from: https://stackoverflow.com/questions/36587211/easiest-way-to-read-csv-files-with-multiprocessing-in-pandas
 
+    PARAMETERS:
+    -----------
+    pool_size : Amount of parallel processes.
+
+
     RETURNS:
-    --------
+    -----------
         all_wavs: A list of tuples, first element being sampling rate,
                     second numpy array containing the data
     """
