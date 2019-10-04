@@ -17,8 +17,8 @@ librosa
 torchsummary
 ipykernel
 autopep8
-tensorboard
 future
-jupyter-tensorboard
 tensorflow
+xgboost
+graphviz
 
