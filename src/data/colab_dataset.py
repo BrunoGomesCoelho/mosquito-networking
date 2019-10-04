@@ -25,3 +25,24 @@ class MosquitoDatasetColab(torch.utils.data.Dataset):
         y = self.y[index]
 
         return x.reshape(1, -1), y
+
+
+class MosquitoDataTemperature(torch.utils.data.Dataset):
+    """Mosquito dataset for PyTorch"""
+    def __init__(self, x, y, device, scaler):
+        self.x = x
+        self.y = y
+        self.device = device
+        self.scaler = scaler
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.x)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        x = self.x[index]
+        x = self.scaler.transform(x.reshape(1, -1))
+        y = self.y[index]
+
+        return x.reshape(1, -1), y
