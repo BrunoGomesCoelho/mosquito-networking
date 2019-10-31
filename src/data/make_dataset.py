@@ -13,29 +13,27 @@ from src.data.read_dataset import read_all_wavs, read_all_csvs
 from src.data import util
 
 
-"""
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-"""
-
-
-def main(reduce_mem_usage=False, subsample=0, save=False):
+def main(conversions=["zero"], reduce_mem_usage=False, subsample=0, save=False,
+        base_dir="../../data"):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
+    valid_conversions = ["zero", "repeat", "resample"]
+    if any([x not in valid_conversions for x in conversions]):
+        raise ValueError("Invalid conversion included! Options are:" + \
+                         f"{valid_conversions}")
+
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
     # Check for using less data
     if subsample:
-        data = read_all_wavs("../data/raw/dadosBruno/", testing=True,
+        data = read_all_wavs(f"{base_dir}/raw/dadosBruno/", testing=True,
                              test_size=subsample)
     else:
-        data = read_all_wavs("../data/raw/dadosBruno/")
+        data = read_all_wavs(f"{base_dir}/raw/dadosBruno/")
 
-    df = read_all_csvs("../data/raw/")
+    df = read_all_csvs(f"{base_dir}/raw/")
     logger.info('load intitial data')
 
     # Process the name column
@@ -43,8 +41,8 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     process_name(wav_df)
 
     # Join sizes with original data
-    output_df = process_wav_length(data[:, 1], wav_df, df)
-    output_df["label"] = output_df["label"].astype(int)
+    df["label"] = df["label"].astype(int)
+    output_df = process_wav_length(data[:, 1], wav_df, df, conversions)
     logger.info('finished processing into 1 df')
 
     if reduce_mem_usage:
@@ -56,7 +54,7 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     gc.collect()
 
     if save:
-        save_file = "../../data/processed/data.csv"
+        save_file = f"{base_dir}/processed/data.csv"
         logger.warning('Saving can take a really long time!')
         logger.info(f'Saving to {save_file}')
         output_df.to_csv(save_file, index=False)
@@ -65,8 +63,8 @@ def main(reduce_mem_usage=False, subsample=0, save=False):
     binarize_labels(output_df, logger)
 
     logger.info("Saving intermediate google colab CSV")
-    output_df[["label", "training", "original_name"]].to_csv("../data/interim/file_names.csv",
-            index=False)
+    output_df[["label", "training", "original_name"]].to_csv(f"{base_dir}/interim/file_names.csv",
+                                                             index=False)
 
     return output_df
 
@@ -96,20 +94,32 @@ def process_name(wav_df):
     wav_df["file"] = wav_df["file"].str.replace("_", "/", n=2).apply(lambda x: x[::-1])
 
 
-def process_wav_length(wav_data, filenames, df, seconds=0.5, sr=44100):
+def process_wav_length(wav_data, filenames, df, conversion="zero",
+                       seconds=0.25, sr=44100, resample_size=0.125, 
+                       testing=False):
     """Process all audios to have the same length.
 
-    We ignore all audios with a bigger size and 0-pad the ones that have less
+    conversion:
+        zero - We ignore all audios with a bigger size and 0-pad the ones that have less
+        repeat - we repeat the audio as many times as necessary to fill the vector
+        resample - we resample the audio to a given size
     """
     amount_samples = int(seconds*sr)
     sizes = np.vectorize(len)(wav_data)
 
     idx = sizes <= amount_samples
     processed_wav_data = wav_data[idx]
-    padded_wavs = np.asarray([pad_center(a, amount_samples)
-                              for a in processed_wav_data])
 
-    new_df = pd.DataFrame(padded_wavs)
+    if conversion == "zero":
+        new_wavs = np.asarray([pad_center(a, amount_samples)
+                              for a in processed_wav_data])
+    elif conversion == "repeat":
+        new_wavs = np.asarray([np.resize(a, amount_samples)
+                               for a in processed_wav_data])
+    elif conversion == "rescale":
+        raise ValueError("TO-DO")
+
+    new_df = pd.DataFrame(new_wavs)
     new_df["file"] = filenames.loc[idx, "file"].values
     new_df["original_name"] = filenames.loc[idx, "original_name"].values
 
@@ -125,9 +135,5 @@ if __name__ == '__main__':
 
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    #load_dotenv(find_dotenv())
 
     main()

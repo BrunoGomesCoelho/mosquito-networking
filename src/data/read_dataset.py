@@ -9,27 +9,7 @@ import pandas as pd
 from scipy.io import wavfile
 
 
-
-
-class MosquitoDataset(torch.utils.data.Dataset):
-    """Mosquito dataset for PyTorch"""
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __len__(self):
-        'Denotes the total number of samples'
-        return len(self.x)
-
-    def __getitem__(self, index):
-        'Generates one sample of data'
-        x = self.x[index]
-        y = self.y[index]
-
-        return x, y
-
-
-def read_temperature(temperature):
+def read_temperature(temperature, conversion):
     from src.data.make_dataset import (process_name, binarize_labels,
                                        process_wav_length)
     """Reads all data of a given temperature.
@@ -44,7 +24,8 @@ def read_temperature(temperature):
     process_name(wav_df)
 
     # Join sizes with original data
-    output_df = process_wav_length(data[:, 1], wav_df, df)
+    output_df = process_wav_length(data[:, 1], wav_df, df, 
+                                   conversion=conversion)
     output_df["label"] = output_df["label"].astype(int)
     binarize_labels(output_df) # binarize the labels
     
@@ -79,7 +60,7 @@ def my_read_wav(filename):
     return np.hstack((wavfile.read(filename), np.array([filename])))
 
 
-def read_all_wavs(folder_path, pool_size=None, sampling_rate=44100,
+def read_all_wavs(folder_path, pool_size=1, sampling_rate=44100,
                   testing=False, test_size=1000):
     """Reads and joins all our wavs files into one big dataframe.
     We do it in parallel to make it faster, since otherwise it takes some time.
